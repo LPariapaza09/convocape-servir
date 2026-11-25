@@ -22,6 +22,7 @@ class AppConfig:
     )
     db_path: Path = BASE_DIR / "ofertas_servir.db"
     output_json: Path = BASE_DIR / "ofertas_economia.json"
+    cache_json: Path = BASE_DIR / "experiencia_cache.json"
     departamentos: tuple[str, ...] = ("AREQUIPA", "LIMA")
     max_workers: int = 12
     carrera_regex: str = "econom"

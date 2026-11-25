@@ -1,5 +1,6 @@
 """Capa de persistencia SQLite y exportación a Excel."""
 
+import json
 from pathlib import Path
 import sqlite3
 import threading
@@ -112,3 +113,17 @@ def update_experience_batch(
 
 def export_json(df: pd.DataFrame, path: Path) -> None:
     df.to_json(path, orient="records", force_ascii=False, indent=2)
+
+
+def load_exp_cache(path: Path) -> dict[str, tuple[int | None, int | None]]:
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return {k: (v[0], v[1]) for k, v in data.items()}
+
+
+def save_exp_cache(
+    path: Path, cache: dict[str, tuple[int | None, int | None]]
+) -> None:
+    serializable = {k: [v[0], v[1]] for k, v in sorted(cache.items())}
+    path.write_text(json.dumps(serializable, ensure_ascii=False, indent=2), encoding="utf-8")

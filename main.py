@@ -4,6 +4,8 @@ import argparse
 import logging
 import sys
 
+import pandas as pd
+
 from servir_pipeline.config import load_config
 from servir_pipeline.enrichment import enrich_experience
 from servir_pipeline.parsers import filter_by_career, filter_by_max_experience
@@ -13,7 +15,9 @@ from servir_pipeline.storage import (
     export_json,
     init_db,
     load_existing_keys,
+    load_exp_cache,
     read_all_postings,
+    save_exp_cache,
     update_experience_batch,
 )
 
@@ -61,8 +65,19 @@ def main() -> int:
         df_filtered = filter_by_career(df, config.carrera_regex, config.solo_bachiller)
         logger.info("Ofertas filtradas por '%s': %d", config.carrera_regex, len(df_filtered))
 
+        # Aplicar caché persistente de Gemini (por nro_aviso) para no reprocesar ofertas ya vistas
+        exp_cache = load_exp_cache(config.cache_json)
+        if exp_cache:
+            aviso_series = df_filtered["nro_aviso"].fillna("").astype(str)
+            cached_gen = aviso_series.map(lambda a: exp_cache[a][0] if a in exp_cache else None)
+            cached_esp = aviso_series.map(lambda a: exp_cache[a][1] if a in exp_cache else None)
+            df_filtered["experiencia_general"] = df_filtered["experiencia_general"].combine_first(cached_gen)
+            df_filtered["experiencia_especifica"] = df_filtered["experiencia_especifica"].combine_first(cached_esp)
+
+        # Re-check rows where nro_aviso is not in cache and not yet in DB
         pending_mask = (
             df_filtered["experiencia"].fillna("").str.strip().ne("")
+            & ~df_filtered["nro_aviso"].fillna("").astype(str).isin(exp_cache.keys())
             & (df_filtered["experiencia_general"].isna() | df_filtered["experiencia_especifica"].isna())
         )
         pending_rows = [
@@ -90,6 +105,19 @@ def main() -> int:
             df_filtered["experiencia_especifica"] = (
                 df_filtered["id"].map(esp_map).combine_first(df_filtered["experiencia_especifica"])
             )
+
+        # Actualizar caché con todos los registros procesados que tengan nro_aviso
+        for _, r in df_filtered.iterrows():
+            aviso = str(r.get("nro_aviso") or "").strip()
+            if aviso and aviso not in exp_cache:
+                eg = r["experiencia_general"]
+                ee = r["experiencia_especifica"]
+                if pd.notna(eg) or pd.notna(ee):
+                    exp_cache[aviso] = (
+                        int(eg) if pd.notna(eg) else None,
+                        int(ee) if pd.notna(ee) else None,
+                    )
+        save_exp_cache(config.cache_json, exp_cache)
 
         df_final = filter_by_max_experience(df_filtered, config.max_exp_general)
         df_final = df_final.sort_values(
