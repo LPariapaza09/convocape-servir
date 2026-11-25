@@ -1,5 +1,6 @@
 """Funciones puras de parseo HTML, normalización y filtrado (sin I/O)."""
 
+from datetime import datetime, timedelta, timezone
 import re
 import unicodedata
 
@@ -153,3 +154,14 @@ def filter_by_max_experience(df: pd.DataFrame, max_exp_general: int) -> pd.DataF
         return df
     exp_num = pd.to_numeric(df["experiencia_general"], errors="coerce")
     return df[exp_num.isna() | (exp_num <= max_exp_general)].copy()
+
+
+def filter_active_postings(df: pd.DataFrame) -> pd.DataFrame:
+    """Elimina convocatorias vencidas según fecha_fin_publicacion (DD/MM/YYYY, hora Perú)."""
+    if df.empty:
+        return df
+    today_pe = datetime.now(timezone(timedelta(hours=-5))).date()
+    end_dates = pd.to_datetime(
+        df["fecha_fin_publicacion"], format="%d/%m/%Y", errors="coerce"
+    ).dt.date
+    return df[end_dates.isna() | (end_dates >= today_pe)].copy()

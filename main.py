@@ -8,7 +8,11 @@ import pandas as pd
 
 from servir_pipeline.config import load_config
 from servir_pipeline.enrichment import enrich_experience
-from servir_pipeline.parsers import filter_by_career, filter_by_max_experience
+from servir_pipeline.parsers import (
+    filter_active_postings,
+    filter_by_career,
+    filter_by_max_experience,
+)
 from servir_pipeline.scraper import run_scrape
 from servir_pipeline.storage import (
     deduplicate_postings,
@@ -119,7 +123,8 @@ def main() -> int:
                     )
         save_exp_cache(config.cache_json, exp_cache)
 
-        df_final = filter_by_max_experience(df_filtered, config.max_exp_general)
+        df_final = filter_active_postings(df_filtered)
+        df_final = filter_by_max_experience(df_final, config.max_exp_general)
         df_final = df_final.sort_values(
             ["incluye_bachiller", "remuneracion_num"], ascending=[False, False]
         )

@@ -293,20 +293,24 @@
         clearBtn.classList.toggle('hidden', query.length === 0);
         clearBtn.classList.toggle('inline-flex', query.length > 0);
 
-        const filtered = allJobs.filter((job) => {
-          const key = String(job.nro_aviso || job.id);
-          if (activeTab === 'guardadas' && !bookmarks.has(key)) return false;
-          const haystack = `${job.puesto} ${job.entidad} ${job.ubicacion} ${job.formacion_academica}`.toLowerCase();
-          if (query && !haystack.includes(query)) return false;
-          if (activeFilter === 'urgent' && daysUntil(job.fecha_fin_publicacion) > 3) return false;
-          if (activeFilter === 'bachiller' && !job.incluye_bachiller) return false;
-          if (activeFilter === 'no-exp' && (job.experiencia_general ?? 0) > 0) return false;
-          if (activeFilter === 'lima' && (job.departamento_filtro || '').toUpperCase() !== 'LIMA') return false;
-          if (activeFilter === 'arequipa' && (job.departamento_filtro || '').toUpperCase() !== 'AREQUIPA') return false;
-          return true;
-        });
+        const activeJobs = allJobs.filter((job) => daysUntil(job.fecha_fin_publicacion) >= 0);
 
-        totalBadge.textContent = `${allJobs.length} vigentes`;
+        const filtered = activeJobs
+          .filter((job) => {
+            const key = String(job.nro_aviso || job.id);
+            if (activeTab === 'guardadas' && !bookmarks.has(key)) return false;
+            const haystack = `${job.puesto} ${job.entidad} ${job.ubicacion} ${job.formacion_academica}`.toLowerCase();
+            if (query && !haystack.includes(query)) return false;
+            if (activeFilter === 'urgent' && daysUntil(job.fecha_fin_publicacion) > 3) return false;
+            if (activeFilter === 'bachiller' && !job.incluye_bachiller) return false;
+            if (activeFilter === 'no-exp' && (job.experiencia_general ?? 0) > 0) return false;
+            if (activeFilter === 'lima' && (job.departamento_filtro || '').toUpperCase() !== 'LIMA') return false;
+            if (activeFilter === 'arequipa' && (job.departamento_filtro || '').toUpperCase() !== 'AREQUIPA') return false;
+            return true;
+          })
+          .sort((a, b) => daysUntil(a.fecha_fin_publicacion) - daysUntil(b.fecha_fin_publicacion));
+
+        totalBadge.textContent = `${activeJobs.length} vigentes`;
         resultsCount.textContent = `Mostrando ${filtered.length} convocatoria(s)`;
         jobsList.innerHTML = filtered.map(renderCard).join('');
         emptyState.classList.toggle('hidden', filtered.length > 0);
