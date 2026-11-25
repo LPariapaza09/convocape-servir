@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ConvocaPE</string>
+    <string name="title_activity_main">ConvocaPE</string>
+    <string name="package_name">pe.convocape.app</string>
+    <string name="custom_url_scheme">pe.convocape.app</string>
+</resources>

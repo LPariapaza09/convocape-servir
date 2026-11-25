@@ -1,0 +1,6 @@
+{
+  "appId": "pe.convocape.app",
+  "appName": "ConvocaPE",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

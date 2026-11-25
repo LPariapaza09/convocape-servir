@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ConvocaPE — Ofertas del Estado</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    globalThis.tailwind = globalThis.tailwind || {};
+    globalThis.tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'success': '#15803D', 'on-success': '#FFFFFF',
+            'success-container': '#DCFCE7', 'on-success-container': '#14532D',
+            'warning': '#B45309', 'on-warning': '#FFFFFF',
+            'warning-container': '#FEF3C7', 'on-warning-container': '#78350F',
+            'light-primary': '#00355F', 'light-on-primary': '#FFFFFF',
+            'light-primary-container': '#0F4C81', 'light-on-primary-container': '#FFFFFF',
+            'light-secondary': '#4F6076', 'light-on-secondary': '#FFFFFF',
+            'light-secondary-container': '#D2E4FF', 'light-on-secondary-container': '#192A3E',
+            'light-error': '#BA1A1A', 'light-on-error': '#FFFFFF',
+            'light-error-container': '#FFDAD6', 'light-on-error-container': '#93000A',
+            'light-surface': '#F9F9FE', 'light-on-surface': '#191C1F',
+            'light-surface-container-lowest': '#FFFFFF',
+            'light-surface-container-low': '#F3F3F8',
+            'light-surface-container': '#EDEDF3',
+            'light-on-surface-variant': '#42474F',
+            'light-outline': '#727780', 'light-outline-variant': '#C2C7D1',
+          },
+          borderRadius: { 'sm': '4px', 'DEFAULT': '8px', 'md': '12px', 'lg': '16px', 'xl': '24px', 'full': '9999px' },
+          spacing: { 'gutter-xs': '4px', 'gutter-sm': '8px', 'gutter-12': '12px', 'gutter-md': '16px', 'gutter-lg': '24px', 'page-margin': '16px' },
+          fontFamily: {
+            'headline': ['"Red Hat Text"', 'sans-serif'],
+            'body': ['"Instrument Sans"', 'sans-serif'],
+            'label': ['"Instrument Sans"', 'sans-serif'],
+            'mono': ['"Spline Sans Mono"', 'monospace'],
+          },
+          fontSize: {
+            'headline-md': ['20px', { lineHeight: '26px', letterSpacing: '-0.2px', fontWeight: '700' }],
+            'title-lg': ['18px', { lineHeight: '24px', letterSpacing: '-0.15px', fontWeight: '700' }],
+            'title-md': ['16px', { lineHeight: '22px', fontWeight: '600' }],
+            'body-md': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+            'body-sm': ['13px', { lineHeight: '18px', fontWeight: '400' }],
+            'label-lg': ['14px', { lineHeight: '20px', fontWeight: '600' }],
+            'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.1px', fontWeight: '600' }],
+            'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.2px', fontWeight: '600' }],
+            'mono-sm': ['12px', { lineHeight: '16px', fontWeight: '600' }],
+          },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Red+Hat+Text:wght@600;700&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined { display: inline-block; width: 1em; height: 1em; line-height: 1 !important; vertical-align: middle; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-light-surface text-light-on-surface font-body antialiased">
+  <div class="min-h-screen flex flex-col bg-light-surface max-w-md mx-auto relative">
+
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-20 bg-light-surface-container-lowest border-b border-light-outline-variant px-page-margin pt-gutter-12 pb-gutter-12 flex flex-col gap-gutter-12">
+      <div class="flex items-center justify-between gap-gutter-sm">
+        <div class="flex items-center gap-gutter-sm">
+          <div class="w-9 h-9 rounded-md bg-light-primary text-light-on-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[20px]">account_balance</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline text-headline-md text-light-on-surface leading-tight">ConvocaPE</span>
+            <span class="font-label text-label-sm text-light-on-surface-variant">Convocatorias CAS y del Estado</span>
+          </div>
+        </div>
+        <span id="total-badge" class="font-mono text-mono-sm px-2.5 py-1 rounded-full bg-light-secondary-container text-light-on-secondary-container tabular-nums">
+          0 vigentes
+        </span>
+      </div>
+
+      <!-- Searchbar -->
+      <form id="job-search-form" role="search" class="flex items-center w-full gap-gutter-sm px-gutter-12 min-h-[44px] rounded-md bg-light-surface-container-low border border-light-outline-variant focus-within:border-light-primary focus-within:bg-light-surface-container-lowest">
+        <span class="material-symbols-outlined text-[20px] text-light-outline shrink-0">search</span>
+        <input id="search-input" type="search" placeholder="Buscar puesto, entidad o distrito..." class="w-full bg-transparent border-0 p-0 text-body-md text-light-on-surface placeholder:text-light-outline focus:ring-0">
+        <button type="button" id="clear-search-btn" aria-label="Limpiar búsqueda" class="hidden items-center justify-center w-8 h-8 rounded-DEFAULT text-light-on-surface-variant hover:bg-light-surface-container shrink-0">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+      </form>
+
+      <!-- Filter Chips -->
+      <nav aria-label="Filtros rápidos" class="flex items-center gap-gutter-sm overflow-x-auto pb-0.5 no-scrollbar">
+        <button data-filter="all" aria-pressed="true" type="button" class="filter-chip inline-flex items-center gap-gutter-xs px-gutter-12 py-1.5 rounded-full bg-light-primary text-light-on-primary border border-light-primary whitespace-nowrap shrink-0">
+          <span class="font-label text-label-md">Todas</span>
+        </button>
+        <button data-filter="urgent" aria-pressed="false" type="button" class="filter-chip inline-flex items-center gap-1.5 px-gutter-12 py-1.5 rounded-full bg-light-surface-container-lowest text-light-on-surface-variant border border-light-outline-variant whitespace-nowrap shrink-0">
+          <span class="material-symbols-outlined text-[16px] text-light-error">schedule</span>
+          <span class="font-label text-label-md">Cierra pronto</span>
+        </button>
+        <button data-filter="bachiller" aria-pressed="false" type="button" class="filter-chip inline-flex items-center gap-gutter-xs px-gutter-12 py-1.5 rounded-full bg-light-surface-container-lowest text-light-on-surface-variant border border-light-outline-variant whitespace-nowrap shrink-0">
+          <span class="font-label text-label-md">Acepta Bachiller</span>
+        </button>
+        <button data-filter="no-exp" aria-pressed="false" type="button" class="filter-chip inline-flex items-center gap-gutter-xs px-gutter-12 py-1.5 rounded-full bg-light-surface-container-lowest text-light-on-surface-variant border border-light-outline-variant whitespace-nowrap shrink-0">
+          <span class="font-label text-label-md">Sin experiencia</span>
+        </button>
+        <button data-filter="lima" aria-pressed="false" type="button" class="filter-chip inline-flex items-center gap-gutter-xs px-gutter-12 py-1.5 rounded-full bg-light-surface-container-lowest text-light-on-surface-variant border border-light-outline-variant whitespace-nowrap shrink-0">
+          <span class="font-label text-label-md">Lima</span>
+        </button>
+        <button data-filter="arequipa" aria-pressed="false" type="button" class="filter-chip inline-flex items-center gap-gutter-xs px-gutter-12 py-1.5 rounded-full bg-light-surface-container-lowest text-light-on-surface-variant border border-light-outline-variant whitespace-nowrap shrink-0">
+          <span class="font-label text-label-md">Arequipa</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-page-margin pt-gutter-md pb-24 flex flex-col gap-gutter-12">
+      <div class="flex items-center justify-between">
+        <h1 id="results-count" class="font-label text-label-md text-light-on-surface-variant">Cargando convocatorias...</h1>
+        <button id="refresh-btn" type="button" class="inline-flex items-center gap-1 text-label-sm text-light-primary">
+          <span class="material-symbols-outlined text-[16px]">refresh</span> Actualizar
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden rounded-lg bg-light-surface-container-lowest border border-light-outline-variant p-gutter-lg text-center flex-col items-center gap-gutter-sm">
+        <span class="material-symbols-outlined text-[32px] text-light-outline">search_off</span>
+        <p class="font-headline text-title-md text-light-on-surface">No encontramos convocatorias</p>
+        <p class="text-body-sm text-light-on-surface-variant">Prueba con otro puesto, entidad o limpia los filtros activos.</p>
+      </div>
+
+      <!-- Alerts Config View (hidden by default) -->
+      <section id="alerts-view" class="hidden rounded-lg bg-light-surface-container-lowest border border-light-outline-variant p-gutter-md flex-col gap-gutter-12">
+        <h2 class="font-headline text-title-lg text-light-on-surface">Fuente de datos (JSON)</h2>
+        <p class="text-body-sm text-light-on-surface-variant">Configura la URL pública donde GitHub Actions publica <code>ofertas_economia.json</code>.</p>
+        <input id="data-url-input" type="url" placeholder="https://raw.githubusercontent.com/.../ofertas_economia.json" class="w-full rounded-md border-light-outline-variant text-body-sm">
+        <button id="save-url-btn" type="button" class="w-full min-h-[44px] rounded-md bg-light-primary text-light-on-primary font-label text-label-lg">Guardar y recargar</button>
+      </section>
+
+      <!-- Dynamic Job Cards Container -->
+      <section id="jobs-list" aria-label="Listado de ofertas laborales" class="grid grid-cols-1 gap-gutter-12"></section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav aria-label="Navegación principal" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-20 bg-light-surface-container-lowest border-t border-light-outline-variant px-gutter-md py-gutter-sm">
+      <ul class="grid grid-cols-3 gap-gutter-sm">
+        <li>
+          <button data-tab="ofertas" type="button" class="nav-tab w-full flex flex-col items-center justify-center gap-0.5 py-1 text-light-primary">
+            <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">work</span>
+            <span class="font-label text-label-sm">Ofertas</span>
+          </button>
+        </li>
+        <li>
+          <button data-tab="guardadas" type="button" class="nav-tab w-full flex flex-col items-center justify-center gap-0.5 py-1 text-light-on-surface-variant">
+            <span class="material-symbols-outlined text-[22px]">bookmark</span>
+            <span class="font-label text-label-sm">Guardadas</span>
+          </button>
+        </li>
+        <li>
+          <button data-tab="alertas" type="button" class="nav-tab w-full flex flex-col items-center justify-center gap-0.5 py-1 text-light-on-surface-variant">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+            <span class="font-label text-label-sm">Config</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <script>
+    (function () {
+      const DEFAULT_DATA_URL = './ofertas_economia.json';
+      const STORAGE_BOOKMARKS = 'convocape_bookmarks';
+      const STORAGE_CACHE = 'convocape_cache';
+      const STORAGE_URL = 'convocape_data_url';
+
+      let allJobs = [];
+      let activeFilter = 'all';
+      let activeTab = 'ofertas';
+      let bookmarks = new Set(JSON.parse(localStorage.getItem(STORAGE_BOOKMARKS) || '[]'));
+
+      const jobsList = document.getElementById('jobs-list');
+      const emptyState = document.getElementById('empty-state');
+      const alertsView = document.getElementById('alerts-view');
+      const resultsCount = document.getElementById('results-count');
+      const totalBadge = document.getElementById('total-badge');
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+      const dataUrlInput = document.getElementById('data-url-input');
+
+      dataUrlInput.value = localStorage.getItem(STORAGE_URL) || DEFAULT_DATA_URL;
+
+      function parseDatePE(str) {
+        if (!str || !str.includes('/')) return null;
+        const [d, m, y] = str.split('/').map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      function daysUntil(str) {
+        const dt = parseDatePE(str);
+        if (!dt) return 999;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return Math.ceil((dt - today) / (1000 * 60 * 60 * 24));
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      function renderCard(job) {
+        const key = String(job.nro_aviso || job.id);
+        const isSaved = bookmarks.has(key);
+        const days = daysUntil(job.fecha_fin_publicacion);
+        const urgent = days <= 3;
+        const deadlineBg = urgent ? 'bg-light-error-container text-light-on-error-container' : (days <= 7 ? 'bg-warning-container text-on-warning-container' : 'bg-light-surface-container-low text-light-on-surface');
+        const expGen = job.experiencia_general ?? 0;
+        const expEsp = job.experiencia_especifica ?? 0;
+        const vacantes = job.cantidad_vacantes ?? 1;
+        const url = job.detalle_url || 'https://app.servir.gob.pe/DifusionOfertasExterno/faces/consultas/ofertas_laborales.xhtml';
+
+        return `
+          <article class="job-card w-full rounded-lg bg-light-surface-container-lowest border border-light-outline-variant p-gutter-md flex flex-col gap-gutter-12">
+            <header class="flex items-start justify-between gap-gutter-sm">
+              <div class="flex flex-col gap-1 min-w-0">
+                <div class="flex items-center gap-1.5 text-light-primary">
+                  <span class="material-symbols-outlined text-[16px] shrink-0">account_balance</span>
+                  <span class="font-label text-label-md text-light-primary truncate">${escapeHtml(job.entidad)}</span>
+                </div>
+                <h2 class="font-headline text-title-lg text-light-on-surface">${escapeHtml(job.puesto)}</h2>
+                <div class="flex items-center gap-1 text-light-on-surface-variant">
+                  <span class="material-symbols-outlined text-[15px] shrink-0">location_on</span>
+                  <span class="font-label text-label-sm tracking-wide">${escapeHtml(job.ubicacion)}</span>
+                </div>
+              </div>
+              <button type="button" data-save-key="${escapeHtml(key)}" aria-label="Guardar oferta" class="bookmark-btn inline-flex items-center justify-center w-9 h-9 rounded-full ${isSaved ? 'text-light-primary' : 'text-light-outline'} hover:bg-light-surface-container-low shrink-0">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${isSaved ? 1 : 0};">bookmark</span>
+              </button>
+            </header>
+
+            <div class="grid grid-cols-2 gap-gutter-sm">
+              <div class="rounded-DEFAULT bg-success-container px-2.5 py-2 flex flex-col gap-0.5">
+                <span class="font-label text-label-sm text-on-success-container">Remuneración</span>
+                <span class="font-mono text-mono-sm text-on-success-container tabular-nums">${escapeHtml(job.remuneracion_texto)}</span>
+              </div>
+              <div class="rounded-DEFAULT ${deadlineBg} px-2.5 py-2 flex flex-col gap-0.5">
+                <span class="font-label text-label-sm flex items-center gap-1">
+                  ${urgent ? '<span class="material-symbols-outlined text-[14px]">schedule</span>' : ''} Fecha límite
+                </span>
+                <span class="font-mono text-mono-sm tabular-nums">${escapeHtml(job.fecha_fin_publicacion)} · ${days >= 0 ? days + ' d' : 'Vencida'}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-gutter-sm">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-DEFAULT bg-light-surface-container-low text-light-on-surface-variant">
+                <span class="material-symbols-outlined text-[15px]">work_history</span>
+                <span class="font-label text-label-md">Exp. general: ${expGen} año(s) | Específica: ${expEsp} año(s)</span>
+              </span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-DEFAULT bg-light-secondary-container text-light-on-secondary-container">
+                <span class="material-symbols-outlined text-[15px]">group</span>
+                <span class="font-label text-label-md tabular-nums">${vacantes} vacante(s)</span>
+              </span>
+            </div>
+
+            <div class="rounded-DEFAULT bg-light-surface-container-low p-2.5 flex flex-col gap-1">
+              <span class="font-label text-label-sm text-light-on-surface-variant">Formación académica</span>
+              <p class="text-body-sm text-light-on-surface line-clamp-2">${escapeHtml(job.formacion_academica)}</p>
+            </div>
+
+            <footer>
+              <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-full gap-gutter-sm min-h-[44px] px-gutter-md py-gutter-sm rounded-md bg-light-primary text-light-on-primary hover:bg-light-primary-container">
+                <span class="font-label text-label-lg">Ver convocatoria / Postular</span>
+                <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+              </a>
+            </footer>
+          </article>
+        `;
+      }
+
+      function render() {
+        if (activeTab === 'alertas') {
+          jobsList.classList.add('hidden');
+          emptyState.classList.add('hidden');
+          alertsView.classList.remove('hidden');
+          alertsView.classList.add('flex');
+          resultsCount.textContent = 'Configuración de fuente JSON';
+          return;
+        }
+        alertsView.classList.add('hidden');
+        alertsView.classList.remove('flex');
+        jobsList.classList.remove('hidden');
+
+        const query = (searchInput.value || '').trim().toLowerCase();
+        clearBtn.classList.toggle('hidden', query.length === 0);
+        clearBtn.classList.toggle('inline-flex', query.length > 0);
+
+        const filtered = allJobs.filter((job) => {
+          const key = String(job.nro_aviso || job.id);
+          if (activeTab === 'guardadas' && !bookmarks.has(key)) return false;
+          const haystack = `${job.puesto} ${job.entidad} ${job.ubicacion} ${job.formacion_academica}`.toLowerCase();
+          if (query && !haystack.includes(query)) return false;
+          if (activeFilter === 'urgent' && daysUntil(job.fecha_fin_publicacion) > 3) return false;
+          if (activeFilter === 'bachiller' && !job.incluye_bachiller) return false;
+          if (activeFilter === 'no-exp' && (job.experiencia_general ?? 0) > 0) return false;
+          if (activeFilter === 'lima' && (job.departamento_filtro || '').toUpperCase() !== 'LIMA') return false;
+          if (activeFilter === 'arequipa' && (job.departamento_filtro || '').toUpperCase() !== 'AREQUIPA') return false;
+          return true;
+        });
+
+        totalBadge.textContent = `${allJobs.length} vigentes`;
+        resultsCount.textContent = `Mostrando ${filtered.length} convocatoria(s)`;
+        jobsList.innerHTML = filtered.map(renderCard).join('');
+        emptyState.classList.toggle('hidden', filtered.length > 0);
+        emptyState.classList.toggle('flex', filtered.length === 0);
+
+        jobsList.querySelectorAll('.bookmark-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const k = btn.dataset.saveKey;
+            if (bookmarks.has(k)) bookmarks.delete(k); else bookmarks.add(k);
+            localStorage.setItem(STORAGE_BOOKMARKS, JSON.stringify([...bookmarks]));
+            render();
+          });
+        });
+      }
+
+      async function loadData() {
+        const url = localStorage.getItem(STORAGE_URL) || DEFAULT_DATA_URL;
+        resultsCount.textContent = 'Actualizando convocatorias...';
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          allJobs = await res.json();
+          localStorage.setItem(STORAGE_CACHE, JSON.stringify(allJobs));
+        } catch (err) {
+          const cached = localStorage.getItem(STORAGE_CACHE);
+          allJobs = cached ? JSON.parse(cached) : [];
+          console.warn('Usando caché local:', err);
+        }
+        render();
+      }
+
+      document.querySelectorAll('.filter-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          activeFilter = chip.dataset.filter || 'all';
+          document.querySelectorAll('.filter-chip').forEach((c) => {
+            const sel = c === chip;
+            c.classList.toggle('bg-light-primary', sel);
+            c.classList.toggle('text-light-on-primary', sel);
+            c.classList.toggle('border-light-primary', sel);
+            c.classList.toggle('bg-light-surface-container-lowest', !sel);
+            c.classList.toggle('text-light-on-surface-variant', !sel);
+            c.classList.toggle('border-light-outline-variant', !sel);
+          });
+          render();
+        });
+      });
+
+      document.querySelectorAll('.nav-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          activeTab = tab.dataset.tab;
+          document.querySelectorAll('.nav-tab').forEach((t) => {
+            const sel = t === tab;
+            t.classList.toggle('text-light-primary', sel);
+            t.classList.toggle('text-light-on-surface-variant', !sel);
+            const icon = t.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.fontVariationSettings = sel ? "'FILL' 1" : "'FILL' 0";
+          });
+          render();
+        });
+      });
+
+      searchInput.addEventListener('input', render);
+      clearBtn.addEventListener('click', () => { searchInput.value = ''; render(); });
+      document.getElementById('job-search-form').addEventListener('submit', (e) => { e.preventDefault(); render(); });
+      document.getElementById('refresh-btn').addEventListener('click', loadData);
+      document.getElementById('save-url-btn').addEventListener('click', () => {
+        localStorage.setItem(STORAGE_URL, dataUrlInput.value.trim() || DEFAULT_DATA_URL);
+        activeTab = 'ofertas';
+        loadData();
+      });
+
+      loadData();
+    })();
+  </script>
+</body>
+</html>

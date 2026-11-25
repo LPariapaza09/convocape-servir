@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+ofertas_servir.db
+app/node_modules/
+app/android/.gradle/
+app/android/app/build/
+app/android/build/
+app/android/capacitor-cordova-android-plugins/build/
